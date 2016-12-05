@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!--
+  Universal robot ur5 launch.  Loads ur5 robot description (see ur_common.launch
+  for more info)
+
+  Usage:
+    ur5_bringup_with_rviz.launch robot_ip:=<value>
+-->
+<launch>
+  
+  <include file="$(find manipulation_bringup)/launch/ur5_bringup_with_rviz.launch"/>
+
+
+  <!--
+    rosrun robotiq_c_model_control CModelRtuNode.py /dev/ttyUSB0
+  -->
+
+  <node name="gripper_control" pkg="robotiq_c_model_control" type="CModelRtuNode.py" args="/dev/ttyUSB0" respawn="true" />
+</launch>

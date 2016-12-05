@@ -1,0 +1,9 @@
+<launch>
+    <!-- include the individual launch files-->
+
+    <!-- launch the camera -->
+    <include file="$(find manipulation)/launch/camera/uvc_ps3eye.launch.xml" />
+ 
+   <!-- launch the aprtil tag detector -->
+   <include file="$(find manipulation)/launch/camera/april.launch.xml" />    
+</launch>

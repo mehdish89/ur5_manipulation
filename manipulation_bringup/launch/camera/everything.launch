@@ -1,0 +1,49 @@
+<launch>
+
+   <arg name="device" default="/dev/video0" />
+
+    <node name="creative" pkg="uvc_camera" type="uvc_camera_node" output="screen">
+      <remap from="image_raw/" to="creative/image_raw/" />
+      <remap from="camera_info/" to="creative/camera_info/" />
+      <param name="device" value="$(arg device)" />
+      <param name="width" value="640" />
+      <param name="height" value="480" />
+      <param name="format" value="yuyv" />
+      <param name="fps" value="60" />
+      <param name="auto_exposure" value="0" />
+      <param name="exposure_absolute" value="75" />
+      <param name="exposure_auto_priority" value="0" />
+      <param name="auto_white_balance" value="0" />
+      <param name="white_balance_temperature" value="2800" />
+      <param name="brightness" value="-45" />
+      <param name="auto_focus" value="0" />
+      <param name="focus_absolute" value="0" />
+      <param name="contrast" value="16" />
+      <param name="saturation" value="128" />
+      <param name="hue" value="0" />
+      <param name="gamma" value="100" />
+      <param name="sharpness" value="3" />
+      <param name="backlight_compensation" value="2" />
+      <param name="gain" value="30" />
+      <param name="auto_gain" value="0" />
+      <param name="horizontal_flip" value="0" />
+      <param name="vertical_flip" value="0" />
+    </node>
+
+   <node name="tag_position" pkg="camera" type="position.py"  output="screen" /> 
+
+<node pkg="apriltags_ros" type="apriltag_detector_node" name="apriltag_detector" output="screen"
+args="camera_info:=/creative/camera_info image_rect:=/creative/image_raw">
+
+<rosparam param="tag_descriptions">
+[
+{id: 0, size: 0.039},
+{id: 1, size: 0.039},
+{id: 2, size: 0.039}]
+
+<param name="/image_rect" value="/creative/image_raw"/>
+
+</rosparam>
+</node>
+
+</launch>

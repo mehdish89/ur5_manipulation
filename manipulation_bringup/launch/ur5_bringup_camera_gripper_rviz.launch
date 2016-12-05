@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<!--
+  Universal robot ur5 launch.  Loads ur5 robot description (see ur_common.launch
+  for more info)
+
+  Usage:
+    ur5_bringup_camera_gripper_rviz.launch robot_ip:=<value>
+-->
+<launch>
+  
+	<include file="$(find manipulation_bringup)/launch/ur5_bringup_gripper_with_rviz.launch"/>
+
+	<include file="$(find manipulation_bringup)/launch/camera/april_camera.launch.xml"/>
+
+</launch>

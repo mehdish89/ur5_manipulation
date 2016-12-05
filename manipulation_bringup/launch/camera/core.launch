@@ -1,0 +1,152 @@
+<launch>
+  <node name="usb_cam" pkg="usb_cam" type="usb_cam_node" output="screen" >
+    <param name="video_device" value="/dev/video0" />
+    <param name="image_width" value="640" />
+    <param name="image_height" value="480" />
+    <param name="pixel_format" value="yuyv" />
+    <param name="camera_frame_id" value="usb_cam" />
+    <param name="io_method" value="mmap"/>
+  </node>
+    <node name="creative" pkg="usb_cam" type="usb_cam_node" output="screen" >
+    <param name="video_device" value="/dev/video2" />
+    <param name="image_width" value="640" />
+    <param name="image_height" value="480" />
+    <param name="pixel_format" value="yuyv" />
+    <param name="camera_frame_id" value="usb_cam" />
+    <param name="io_method" value="mmap"/>
+  </node>
+
+<!--arg name="device" default="/dev/video0" />
+
+    <node name="ps3eye" pkg="uvc_camera" type="uvc_camera_node" output="screen">
+      <remap from="image_raw/" to="ps3eye/image_raw/" />
+      <remap from="camera_info/" to="ps3eye/camera_info/" />
+      <param name="device" value="$(arg device)" />
+      <param name="width" value="640" />
+      <param name="height" value="480" />
+      <param name="format" value="yuyv" />
+      <param name="fps" value="30" />
+      <param name="auto_exposure" value="0" />
+      <param name="exposure_absolute" value="75" />
+      <param name="exposure_auto_priority" value="0" />
+      <param name="auto_white_balance" value="0" />
+      <param name="white_balance_temperature" value="2800" />
+      <param name="brightness" value="-45" />
+      <param name="auto_focus" value="0" />
+      <param name="focus_absolute" value="0" />
+      <param name="contrast" value="16" />
+      <param name="saturation" value="128" />
+      <param name="hue" value="0" />
+      <param name="gamma" value="100" />
+      <param name="sharpness" value="3" />
+      <param name="backlight_compensation" value="2" />
+      <param name="gain" value="30" />
+      <param name="auto_gain" value="0" />
+      <param name="horizontal_flip" value="0" />
+      <param name="vertical_flip" value="0" />
+      <param name="camera_info_url" value="file://$(find camera)/launch/ps3eye.yaml"/>
+    </node>
+
+
+<arg name="device1" default="/dev/video2" />
+
+    <node name="creative" pkg="uvc_camera" type="uvc_camera_node" output="screen">
+    <remap from="image_raw/" to="creative/image_raw/" />
+    <remap from="camera_info/" to="creative/camera_info/" />
+    <param name="device1" value="/dev/video2" />
+    </node-->
+
+
+<!--node pkg="uvc_camera" type="uvc_camera_node" name="ps3eye1" output="screen"
+args="camera_info:=/ps3eye/camera_info image_rect:=/image2" launch-prefix="taskset -c 1"-->
+
+
+<node name="pose_in_worldframe" pkg="camera" type="worldframe.py"/>
+<node name="tag_position" pkg="camera" type="position.py"  output="screen" />
+<node name="distribute_image" pkg="camera" type="distribute_image.py" output="screen"/>
+
+<node pkg="apriltags_ros" type="apriltag_detector_node" name="apriltag_detector1" output="screen"
+args="camera_info:=/ps3eye/camera_info image_rect:=/image1" launch-prefix="taskset -c 0">
+
+<rosparam param="tag_descriptions">
+[
+{id: 0, size: 0.0736},
+{id: 1, size: 0.0736},
+{id: 2, size: 0.0736},
+{id: 3, size: 0.0736},
+{id: 4, size: 0.0736},
+{id: 5, size: 0.0736},
+{id: 6, size: 0.0736},
+{id: 7, size: 0.0736},
+{id: 8, size: 0.0736},
+{id: 9, size: 0.0736},
+{id: 10, size: 0.0736},
+{id: 11, size: 0.0736},
+{id: 12, size: 0.0736},
+{id: 13, size: 0.0736},
+{id: 14, size: 0.0736},
+{id: 15, size: 0.0736},
+{id: 16, size: 0.0736}]
+
+<param name="/image_rect" value="/image1"/>
+
+</rosparam>
+</node>
+
+<node pkg="apriltags_ros" type="apriltag_detector_node" name="apriltag_detector2" output="screen"
+args="camera_info:=/ps3eye/camera_info image_rect:=/image2" launch-prefix="taskset -c 1">
+
+<rosparam param="tag_descriptions">
+[
+{id: 0, size: 0.0736},
+{id: 1, size: 0.0736},
+{id: 2, size: 0.0736},
+{id: 3, size: 0.0736},
+{id: 4, size: 0.0736},
+{id: 5, size: 0.0736},
+{id: 6, size: 0.0736},
+{id: 7, size: 0.0736},
+{id: 8, size: 0.0736},
+{id: 9, size: 0.0736},
+{id: 10, size: 0.0736},
+{id: 11, size: 0.0736},
+{id: 12, size: 0.0736},
+{id: 13, size: 0.0736},
+{id: 14, size: 0.0736},
+{id: 15, size: 0.0736},
+{id: 16, size: 0.0736}]
+
+<param name="/image_rect" value="/image2"/>
+
+</rosparam>
+</node>
+
+<node pkg="apriltags_ros" type="apriltag_detector_node" name="apriltag_detector3" output="screen"
+args="camera_info:=/ps3eye/camera_info image_rect:=/image3" launch-prefix="taskset -c 2">
+
+<rosparam param="tag_descriptions">
+[
+{id: 0, size: 0.0736},
+{id: 1, size: 0.0736},
+{id: 2, size: 0.0736},
+{id: 3, size: 0.0736},
+{id: 4, size: 0.0736},
+{id: 5, size: 0.0736},
+{id: 6, size: 0.0736},
+{id: 7, size: 0.0736},
+{id: 8, size: 0.0736},
+{id: 9, size: 0.0736},
+{id: 10, size: 0.0736},
+{id: 11, size: 0.0736},
+{id: 12, size: 0.0736},
+{id: 13, size: 0.0736},
+{id: 14, size: 0.0736},
+{id: 15, size: 0.0736},
+{id: 16, size: 0.0736}]
+
+<param name="/image_rect" value="/image3"/>
+
+</rosparam>
+</node>
+
+</launch>

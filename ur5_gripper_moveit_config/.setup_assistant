@@ -1,0 +1,8 @@
+moveit_setup_assistant_config:
+  URDF:
+    package: ur_gripper_description
+    relative_path: urdf/ur5_robot.urdf.xacro
+  SRDF:
+    relative_path: config/ur5.srdf
+  CONFIG:
+    generated_timestamp: 1480727314

@@ -1,0 +1,8 @@
+#!/bin/bash
+
+chmod 666 /sys/module/lsm/parameters/module_locking 
+echo 0 >  /sys/module/lsm/parameters/module_locking
+
+insmod drivers/media/usb/gspca/gspca_main.ko
+insmod drivers/media/usb/gspca/gspca_ov534.ko
+
