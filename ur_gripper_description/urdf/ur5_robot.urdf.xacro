@@ -2,14 +2,23 @@
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro"
        name="ur5" >
 
+  <property name="pi" value="3.14159265" />
+
   <!-- common stuff -->
   <xacro:include filename="$(find ur_gripper_description)/urdf/common.gazebo.xacro" />
 
   <!-- ur5 -->
   <xacro:include filename="$(find ur_gripper_description)/urdf/ur5.urdf.xacro" />
 
+  <!-- robotiq_c_2finger -->
+  <xacro:include filename="$(find ur_gripper_description)/urdf/gripper/robotiq_c2_model_macro.xacro" />
+
+
   <!-- arm -->
   <xacro:ur5_robot prefix="" joint_limited="false"/>
+
+  <!-- gripper -->
+  <xacro:robotiq_c2_model prefix="gripper_"/>
 
   <link name="world" />
 
@@ -18,5 +27,13 @@
     <child link = "base_link" />
     <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
   </joint>
+
+  <joint name="gripper_joint" type="fixed">
+    <parent link="tool0" />
+    <child link = "gripper_robotiq_85_adapter_link" />
+    <origin xyz="0.0 0.0 0.0" rpy="${pi/2} ${-pi/2} 0.0" />
+  </joint>
+
+
 
 </robot>

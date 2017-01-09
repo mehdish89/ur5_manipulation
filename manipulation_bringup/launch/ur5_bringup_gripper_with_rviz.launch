@@ -8,12 +8,19 @@
 -->
 <launch>
   
-  <include file="$(find manipulation_bringup)/launch/ur5_bringup_with_rviz.launch"/>
+	<include file="$(find manipulation_bringup)/launch/ur5_bringup_with_rviz.launch"/>
 
 
-  <!--
-    rosrun robotiq_c_model_control CModelRtuNode.py /dev/ttyUSB0
-  -->
+	<!--
+	rosrun robotiq_c_model_control CModelRtuNode.py /dev/ttyUSB0
+	-->
+	<node name="gripper_control" pkg="robotiq_c_model_control" type="CModelRtuNode.py" args="/dev/ttyUSB0" respawn="true" />
 
-  <node name="gripper_control" pkg="robotiq_c_model_control" type="CModelRtuNode.py" args="/dev/ttyUSB0" respawn="true" />
+	<!--
+	rosrun ur5_gripper_moveit_config robotiq_c2_state_publisher.py
+	-->
+	<node name="gripper_state_publisher" pkg="ur5_gripper_moveit_config" type="robotiq_c2_state_publisher.py" respawn="true" />  
+
+
+
 </launch>

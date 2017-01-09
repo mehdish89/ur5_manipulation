@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+
+<launch>
+  
+	<include file="$(find realsense_camera)/launch/sr300_nodelet_rgbd.launch"/>
+
+	<rosparam param="/camera/driver/f200_filter_option" subst_value="True"> 6 </rosparam>
+	<rosparam param="/camera/driver/f200_confidence_threshold" subst_value="True"> 1 </rosparam>
+
+	<!-- rosparam set /cube_description -t cube.urdf -->
+	<rosparam param="/cube_description" command="load" file="$(find ur_gripper_description)/urdf/objects/cube.urdf" />
+
+
+</launch>

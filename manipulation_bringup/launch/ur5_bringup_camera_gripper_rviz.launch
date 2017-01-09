@@ -8,8 +8,15 @@
 -->
 <launch>
   
-	<include file="$(find manipulation_bringup)/launch/ur5_bringup_gripper_with_rviz.launch"/>
+	<!-- <include file="$(find manipulation_bringup)/launch/ur5_bringup_gripper_with_rviz.launch"/> -->
 
 	<include file="$(find manipulation_bringup)/launch/camera/april_camera.launch.xml"/>
+
+	<!-- rosparam set /cube_description -t cube.urdf -->
+	<rosparam param="/cube_description" command="load" file="$(find ur_gripper_description)/urdf/objects/cube.urdf" />
+
+	<!-- rosrun ur5_gripper_moveit_config transform_publisher.py -->
+	<!-- <node name="transform_publisher" pkg="ur5_gripper_moveit_config" type="transform_publisher.py" respawn="true" />   -->
+
 
 </launch>

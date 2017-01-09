@@ -1,18 +1,21 @@
 <launch>
+
+<arg name="camera" default="ps3eye" />
+
 <node pkg="apriltags_ros" type="apriltag_detector_node" name="apriltag_detector" output="screen"
-args="camera_info:=/ps3eye/camera_info image_rect:=/ps3eye/image_raw">
+  args=" image_rect:=/$(arg camera)/image_raw camera_info:=/$(arg camera)/camera_info" respawn="true" >
 
 <rosparam param="tag_descriptions">
 [
-{id: 0, size: 0.0736},
+{id: 0, size: 0.045, frame_id: tool},
 {id: 1, size: 0.0736},
 {id: 2, size: 0.0736},
 {id: 3, size: 0.0736},
 {id: 4, size: 0.0736},
-{id: 5, size: 0.0736, frame_id: world},
+{id: 5, size: 0.082, frame_id: zero},
 {id: 6, size: 0.0736},
 {id: 7, size: 0.0736},
-{id: 8, size: 0.0736, frame_id: object},
+{id: 8, size: 0.030, frame_id: cube},
 {id: 9, size: 0.0736},
 {id: 10, size: 0.0736},
 {id: 11, size: 0.0736},
@@ -22,7 +25,7 @@ args="camera_info:=/ps3eye/camera_info image_rect:=/ps3eye/image_raw">
 {id: 15, size: 0.0736},
 {id: 16, size: 0.0736}]
 
-<param name="/image_rect" value="/ps3eye/image_raw"/>
+<!-- <param name="/image_rect" value="$(arg camera)/image_raw"/> -->
 
 </rosparam>
 </node>

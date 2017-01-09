@@ -8,7 +8,7 @@
       <param name="width" value="640" />
       <param name="height" value="480" />
       <param name="format" value="yuyv" />
-      <param name="fps" value="30" />
+      <param name="fps" value="10" />
       <!-- param name="power_line_frequency" value="60"/ -->
       <param name="auto_exposure" value="0" />
       <param name="exposure_absolute" value="75" />
@@ -28,7 +28,7 @@
       <param name="auto_gain" value="0" />
       <param name="horizontal_flip" value="0" />
       <param name="vertical_flip" value="0" />
-      <param name="camera_info_url" value="file://$(find manipulation)/launch/ps3eye.yaml"/>
+      <param name="camera_info_url" value="file://$(find manipulation_bringup)/launch/camera/ps3eye.yaml"/>
     </node>
 </launch>
 

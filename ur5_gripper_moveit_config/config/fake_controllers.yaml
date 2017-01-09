@@ -9,4 +9,4 @@ controller_list:
       - wrist_3_joint
   - name: fake_endeffector_controller
     joints:
-      []
+      - gripper_robotiq_85_left_knuckle_joint

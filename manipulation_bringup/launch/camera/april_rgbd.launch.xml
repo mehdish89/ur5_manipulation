@@ -1,0 +1,11 @@
+<launch>
+    <!-- include the individual launch files-->
+
+    <!-- launch the camera -->
+    <include file="$(find manipulation_bringup)/launch/camera/rgbd.launch.xml" />
+ 
+   <!-- launch the aprtil tag detector -->
+   <include file="$(find manipulation_bringup)/launch/camera/april.launch.xml">
+   		<arg name="camera" value="camera/rgb"/>
+   </include>    
+</launch>
