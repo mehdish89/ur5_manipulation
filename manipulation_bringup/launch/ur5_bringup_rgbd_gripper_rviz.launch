@@ -16,7 +16,11 @@
 	<rosparam param="/cube_description" command="load" file="$(find ur_gripper_description)/urdf/objects/cube.urdf" />
 
 	<!-- rosrun ur5_gripper_moveit_config transform_publisher.py -->
-	<node name="transform_publisher" pkg="ur5_gripper_moveit_config" type="transform_publisher.py" respawn="true" />  
+	<node name="transform_publisher" pkg="ur5_gripper_moveit_config" type="transform_publisher.py" respawn="false" />  
+	
+	<node name="pcl_object" pkg="ur5_gripper_moveit_config" type="pcl.py" respawn="true" />  
+	
+	<node name="objec_plane_detector" pkg="ur5_gripper_moveit_config" type="planes.py" respawn="true" />  
 
 
 </launch>

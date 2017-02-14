@@ -7,14 +7,14 @@
 
 <rosparam param="tag_descriptions">
 [
-{id: 0, size: 0.045, frame_id: tool},
+{id: 0, size: 0.044, frame_id: tool},
 {id: 1, size: 0.0736},
-{id: 2, size: 0.0736},
+{id: 2, size: 0.044},
 {id: 3, size: 0.0736},
 {id: 4, size: 0.0736},
 {id: 5, size: 0.082, frame_id: zero},
 {id: 6, size: 0.0736},
-{id: 7, size: 0.0736},
+{id: 7, size: 0.044},
 {id: 8, size: 0.030, frame_id: cube},
 {id: 9, size: 0.0736},
 {id: 10, size: 0.0736},

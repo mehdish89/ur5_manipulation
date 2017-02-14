@@ -31,7 +31,7 @@
   <joint name="gripper_joint" type="fixed">
     <parent link="tool0" />
     <child link = "gripper_robotiq_85_adapter_link" />
-    <origin xyz="0.0 0.0 0.0" rpy="${pi/2} ${-pi/2} 0.0" />
+    <origin xyz="0.0 0.0 0.04" rpy="${pi/2} ${-pi/2} 0.0" />
   </joint>
 
 

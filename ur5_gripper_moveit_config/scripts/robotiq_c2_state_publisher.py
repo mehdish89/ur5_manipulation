@@ -29,7 +29,7 @@ def state_callback(msg):
 					'gripper_robotiq_85_left_finger_tip_joint', 
 					'gripper_robotiq_85_right_finger_tip_joint']
 
-		pos = 0.85*(float(msg.gPO-3)/(230-3))
+		pos = 0.85*(float(msg.gPO-3)/(255-3))
 
 		fwd.position = [pos, pos, pos, pos, -pos, -pos]
 
