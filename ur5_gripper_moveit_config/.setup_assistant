@@ -5,4 +5,6 @@ moveit_setup_assistant_config:
   SRDF:
     relative_path: config/ur5.srdf
   CONFIG:
-    generated_timestamp: 1481151860
+    author_name: Seyed Mahdi Shamsi
+    author_email: seyedmah@buffalo.edu
+    generated_timestamp: 1487042773

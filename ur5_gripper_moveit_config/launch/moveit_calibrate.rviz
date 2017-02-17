@@ -5,6 +5,9 @@ Panels:
     Property Tree Widget:
       Expanded:
         - /MotionPlanning1
+        - /MotionPlanning1/Scene Robot1
+        - /MotionPlanning1/Planning Request1
+        - /MotionPlanning1/Planned Path1
         - /MarkerArray1
         - /MarkerArray1/Namespaces1
       Splitter Ratio: 0.425595
@@ -184,8 +187,8 @@ Visualization Manager:
         Loop Animation: true
         Robot Alpha: 0.5
         Robot Color: 150; 50; 150
-        Show Robot Collision: true
-        Show Robot Visual: true
+        Show Robot Collision: false
+        Show Robot Visual: false
         Show Trail: false
         State Display Time: 0.05 s
         Trajectory Topic: move_group/display_planned_path
@@ -203,7 +206,7 @@ Visualization Manager:
         Interactive Marker Size: 0.2
         Joint Violation Color: 255; 0; 255
         Planning Group: manipulator
-        Query Goal State: true
+        Query Goal State: false
         Query Start State: false
         Show Workspace: false
         Start State Alpha: 1
@@ -327,7 +330,7 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
-        Robot Alpha: 0.5
+        Robot Alpha: 0.15
         Show Robot Collision: false
         Show Robot Visual: true
       Value: true
@@ -371,7 +374,7 @@ Visualization Manager:
       Color: 255; 255; 255
       Color Transformer: RGB8
       Decay Time: 0
-      Enabled: true
+      Enabled: false
       Invert Rainbow: false
       Max Color: 255; 255; 255
       Max Intensity: 4096
@@ -388,7 +391,7 @@ Visualization Manager:
       Unreliable: false
       Use Fixed Frame: true
       Use rainbow: true
-      Value: true
+      Value: false
     - Class: rviz/Axes
       Enabled: true
       Length: 0.05
@@ -415,7 +418,7 @@ Visualization Manager:
       Color: 255; 255; 255
       Color Transformer: RGB8
       Decay Time: 0
-      Enabled: false
+      Enabled: true
       Invert Rainbow: false
       Max Color: 255; 255; 255
       Max Intensity: 4096
@@ -432,23 +435,15 @@ Visualization Manager:
       Unreliable: false
       Use Fixed Frame: true
       Use rainbow: true
-      Value: false
+      Value: true
     - Class: rviz/MarkerArray
-      Enabled: true
+      Enabled: false
       Marker Topic: /camera/depth/planes_center
       Name: MarkerArray
       Namespaces:
         {}
       Queue Size: 0
-      Value: true
-    - Class: rviz/Marker
-      Enabled: true
-      Marker Topic: /objects
-      Name: Marker
-      Namespaces:
-        "": true
-      Queue Size: 100
-      Value: true
+      Value: false
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -464,22 +459,22 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/XYOrbit
-      Distance: 3.14775
+      Distance: 1.16811
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.06
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 1.05263
-        Y: 0.610668
-        Z: -3.18056e-06
+        X: 0.712775
+        Y: 0.191928
+        Z: -3.12096e-06
       Name: Current View
       Near Clip Distance: 0.01
-      Pitch: 0.504797
+      Pitch: 1.0748
       Target Frame: world
       Value: XYOrbit (rviz)
-      Yaw: 5.84845
+      Yaw: 5.54027
     Saved: ~
 Window Geometry:
   Displays:

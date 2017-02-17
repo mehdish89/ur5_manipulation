@@ -13,6 +13,79 @@ import cv2.cv as cv
 import struct
 import ctypes
 
+from visualization_msgs.msg import Marker
+
+from geometry_msgs.msg import Point
+
+from scipy.cluster.vq import vq, kmeans, whiten
+
+import tf
+
+def visualize(points):
+	marker = Marker()
+	marker.header.frame_id ="camera_depth_optical_frame"
+	marker.type = 8
+	marker.id = 1
+	
+	# marker.pose.position.x = p[0]
+	# marker.pose.position.y = p[1]
+	# marker.pose.position.z = p[2]
+
+	color = 2
+
+	marker.scale.x = 0.01
+	marker.scale.y = 0.01
+	marker.scale.z = 0.01
+
+	marker.color.a = 1.0
+	marker.color.r = color % 2
+	marker.color.g = (color/2) % 2
+	marker.color.b = (color/4) % 2
+
+	for p in points:
+		point = Point()
+		point.x = p[0]
+		point.y = p[1]
+		point.z = p[2]
+
+		marker.points.append(point)
+
+	mpub = rospy.Publisher('/objects', Marker, queue_size=1)
+	mpub.publish(marker)
+
+def cluster(npc):
+	print("clustering")
+	points = np.array(npc)
+	points = points[:, 0:3]
+
+	dev = np.std(points, axis=0)#, ddof=1)
+
+	# print("whitening")
+	points = whiten(points)
+	# print(points)
+
+	
+	for k in range(1,10):
+		# k = 5
+		clusters, dist = kmeans(points, k)
+		print(k, dist)
+		if(dist<0.20):
+			break
+		# print(clusters)
+	
+	clusters *= dev
+
+	sorted_clusters = sorted(clusters, key=lambda x:x[2])
+
+	visualize(sorted_clusters)
+
+	# print(sorted_clusters)
+
+	return sorted_clusters
+
+	
+
+
 
 def callback(cloud):
 	# rospy.loginfo(cloud)
@@ -97,12 +170,24 @@ def callback(cloud):
 			continue
 
 
-		npc.append((x,y,z,rgb))
+		npc.append([x,y,z,rgb])
 		obz.append((x, y, z, r, g, b))
 	
 	print(count)
 
 	msg = pc2.create_cloud(cloud.header, cloud.fields, npc)
+
+	# print("before clustering")
+	clusters = cluster(npc)
+
+	last_stamp = rospy.Time.now()
+
+	br = tf.TransformBroadcaster()
+	br.sendTransform(clusters[0],
+                     np.array([0, 0, 0, 1]) ,
+                     last_stamp,
+                     '/cube', 
+                     '/camera_rgb_optical_frame')	
 
 	# print(msg)
 

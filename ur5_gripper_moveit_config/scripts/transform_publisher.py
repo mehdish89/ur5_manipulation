@@ -95,10 +95,22 @@ if __name__ == '__main__':
 
 
         # ztrans = (-1.082, -0.712, -0.088)
-        # zrot = (0.051, -0.028, 0.004, 0.998) 
+        # zrot = (0.051, -0.028, 0.004, 0.998)
 
-        ztrans = (-1.078, -0.552, -0.169)
-        zrot = (-0.011, -0.007, 0.035, 0.999) 
+        xoff = rospy.get_param("/camera/driver/x_offset")
+        yoff = rospy.get_param("/camera/driver/y_offset")
+        zoff = rospy.get_param("/camera/driver/z_offset")
+
+        thoff = rospy.get_param("/camera/driver/th_offset")
+
+
+        # ztrans = (-1.078 + xoff, -0.552 + yoff, -0.169 + zoff)
+        # # zrot = (-0.011, -0.007, 0.035, 0.999) 
+        # zrot = (0, 0, 0.035 + thoff, 1) 
+
+        ztrans = (-1.100 + xoff, -0.497 + yoff, -0.144 + zoff)
+        # zrot = (-0.011, -0.007, 0.035, 0.999) 
+        zrot = (0, 0, 0.045 + thoff, 1)
 
         br.sendTransform(ztrans,
                          zrot,

@@ -32,11 +32,15 @@ pthr = 0.3
 
 
 def rand_plane(npc):
+
+	if(len(npc)==0):
+		return np.array((0, 0, 0, 0))
+
 	ia = randint(0,len(npc)-1)
 	ib = randint(0,len(npc)-1)
 	ic = randint(0,len(npc)-1)
 
-	if(ia == ib and ib == ic): return read_plane(npc)
+	if(ia == ib and ib == ic): return rand_plane(npc)
 
 	p1 = np.array((npc[ia][0], npc[ia][1], npc[ia][2]))
 	p2 = np.array((npc[ib][0], npc[ib][1], npc[ib][2]))
@@ -185,6 +189,17 @@ def middle_point(p1, d1, p2, d2):
 
 	return (c1 + c2)/2
 
+def average(npc):
+	count = 0
+	mp = np.array((0.,0.,0.))
+
+	for p in npc:
+		mp += p[0:3]
+		count += 1
+
+	if(count>0):
+		mp /= float(count)
+	return mp
 
 def callback(cloud):
 	global pub
@@ -251,8 +266,8 @@ def callback(cloud):
 	for q in cands:
 		p += q / float(len(cands))
 
-	if(float(len(valids)==1)):
-		p = means[valids[0]][0:3]
+	if(float(len(valids)<=1)):
+		p = average(npc)
 
 	msg.markers = [msg.markers[i] for i in valids]
 	planes = [planes[i] for i in valids]
