@@ -85,11 +85,16 @@ def cluster(npc):
 
 	
 
-
+counter = 0
 
 def callback(cloud):
 	# rospy.loginfo(cloud)
-	global obz
+	global obz, counter
+
+	counter+=1
+	if counter%3>0:
+		return
+	print(counter)
 
 	pc = pc2.read_points(cloud, skip_nans=True, field_names=("x", "y", "z", "rgb"))
 	npc = []
@@ -103,12 +108,11 @@ def callback(cloud):
 	gs = rospy.get_param("/camera/driver/s_goal")
 	gv = rospy.get_param("/camera/driver/v_goal")
 
-	count = 0
+	
 
 
 	for p in pc:
 
-		count += 1
 
 		x = p[0]
 		y = p[1]
@@ -172,8 +176,7 @@ def callback(cloud):
 
 		npc.append([x,y,z,rgb])
 		obz.append((x, y, z, r, g, b))
-	
-	print(count)
+
 
 	msg = pc2.create_cloud(cloud.header, cloud.fields, npc)
 
@@ -213,13 +216,6 @@ def listener():
     # spin() simply keeps python from exiting until this node is stopped
 	rospy.spin()
 
-"""
-def on_scan(self, scan):
-    rospy.loginfo("Got scan, projecting")
-    cloud = self.laser_projector.projectLaser(scan)
-    gen = pc2.read_points(cloud, skip_nans=True, field_names=("x", "y", "z"))
-    self.xyz_generator = gen
-"""
 
 if __name__ == '__main__':
     listener()

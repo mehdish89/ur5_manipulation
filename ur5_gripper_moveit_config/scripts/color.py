@@ -13,6 +13,9 @@ import cv2.cv as cv
 import struct
 import ctypes
 
+from sensor_msgs.msg import Image
+from cv_bridge import CvBridge, CvBridgeError
+
 """
 def callback(cloud):
 	# rospy.loginfo(cloud)
@@ -117,6 +120,9 @@ def callback(cloud):
 refPt = []
 cropping = False
 
+
+hsv_min = np.array([180., 255., 255.])
+hsv_max = np.array([0., 0., 0.])
  
 def click_and_crop(event, x, y, flags, param):
 	# grab references to the global variables
@@ -125,12 +131,12 @@ def click_and_crop(event, x, y, flags, param):
 	# if the left mouse button was clicked, record the starting
 	# (x, y) coordinates and indicate that cropping is being
 	# performed
-	if event == cv2.EVENT_LBUTTONDOWN:
+	if event == cv2.EVENT_LBUTTONDOWN or event == cv2.EVENT_RBUTTONDOWN:
 		refPt = [(x, y)]
 		cropping = True
  
 	# check to see if the left mouse button was released
-	elif event == cv2.EVENT_LBUTTONUP:
+	elif event == cv2.EVENT_LBUTTONUP or event == cv2.EVENT_RBUTTONUP:
 		# record the ending (x, y) coordinates and indicate that
 		# the cropping operation is finished
 		refPt.append((x, y))
@@ -155,20 +161,40 @@ def click_and_crop(event, x, y, flags, param):
 		xb = float(abs(x2 - x1)/2)
 		yb = float(abs(y2 - y1)/2)
 
-		print("##########")
-		print(image[xm, ym])
-		print(xb/size, yb/size)
+		# print("##########")
+		# print(image[xm, ym])
+		# print(xb/size, yb/size)
 
 
 
 
-		image = image[min(x1,x2):max(x1,x2),min(y1,y2):max(y1,y2)].copy()
+		cropped = image[min(x1,x2):max(x1,x2),min(y1,y2):max(y1,y2)].copy()
+		rgb = cv2.cvtColor(cropped, cv2.COLOR_HSV2BGR)
+
+		hc, wc, nc = cropped.shape 
+
+		print(hc, wc, nc)
+		pixels = cropped[:].reshape([hc*wc, nc])
+
+		global hsv_min, hsv_max
+
+		hsv_min = np.fmin(hsv_min, np.amin(pixels, axis = 0))
+		hsv_max = np.fmax(hsv_max, np.amax(pixels, axis = 0))
+
+		print(hsv_min)
+		print(hsv_max)
+
+		
+
+		# masked = cv2.bitwise_and(image, image, mask= mask)
 
 
 		# print(image2.shape)
 
 
-		cv2.imshow("image", image)
+		# cv2.imshow("image", masked)
+		# cv2.waitKey()
+
 
 
 def generate(h, s, v, hb, sb, vb):
@@ -189,7 +215,7 @@ def generate(h, s, v, hb, sb, vb):
 	width = size
 
 	rgb = np.zeros((height,width,3), np.uint8)
-	hsv = cv2.cvtColor(rgb, cv2.COLOR_RGB2HSV)
+	hsv = cv2.cvtColor(rgb, cv2.COLOR_BGR2HSV)
 	hsv = np.zeros((height,width,3), np.float32)
 	# hsv = rgb
 
@@ -212,7 +238,7 @@ def generate(h, s, v, hb, sb, vb):
 	global image
 	image = hsv
 
-	rgb = cv2.cvtColor(hsv, cv2.COLOR_HSV2RGB)
+	# rgb = cv2.cvtColor(hsv, cv2.COLOR_HSV2RGB)
 
 	cv2.namedWindow("image")
 	cv2.setMouseCallback("image", click_and_crop)
@@ -221,10 +247,57 @@ def generate(h, s, v, hb, sb, vb):
 	cv2.waitKey()
 	cv2.destroyAllWindows()
 
+bridge = CvBridge()
+mask = None
     
-def listener():
+def handle_frame(msg):
 
-	generate(0.5, 0.5, 0.7, 0.5, 0.5, 0.5)
+	# global counter
+	# counter+=1
+	# if(counter%3>0):
+	# 	return
+	global image
+
+	try:
+		img = bridge.imgmsg_to_cv2(msg, "bgr8")
+	except CvBridgeError as e:
+		print(e)
+
+	# img = cv2.medianBlur(img,5)
+	img = cv2.GaussianBlur(img,(11,11),0)
+
+	h = img.shape[0]
+	w = img.shape[1]
+
+	img2 = np.array(img)
+
+	hsv = cv2.cvtColor(img2, cv2.COLOR_BGR2HSV)
+	image = hsv
+
+	cv2.namedWindow("image")
+	cv2.setMouseCallback("image", click_and_crop)
+
+		
+	mask = cv2.inRange(image, hsv_min, hsv_max)
+	masked = cv2.cvtColor(mask, cv2.COLOR_GRAY2BGR)
+	# masked = cv2.bitwise_and(image, image, mask= mask)
+	img = np.fmax(masked, img)
+
+	cv2.imshow("image", img)
+	if cv2.waitKey(1) & 0xFF == ord('q'):
+			exit(0)
+	# plt.draw()
+
+# [  0.  66.  64.]
+# [ 179.  205.  212.]
+
+def listener():
+	rospy.init_node('color_selector')
+	rospy.Subscriber("/c230/image_raw", Image, handle_frame, queue_size = 1)
+	
+	rospy.spin()
+
+	# generate(0.5, 0.5, 0.7, 0.5, 0.5, 0.5)
 
 	# global pub
 	# pub = rospy.Publisher('/camera/depth/object', PointCloud2, queue_size=1)

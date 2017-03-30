@@ -310,11 +310,11 @@ def callback(cloud):
 
 	last_stamp = rospy.Time.now()
 
-	br.sendTransform(trans,
-                     rot,
-                     last_stamp,
-                     '/cube', 
-                     '/camera_rgb_optical_frame')
+	# br.sendTransform(trans,
+ #                     rot,
+ #                     last_stamp,
+ #                     '/cube', 
+ #                     '/camera_rgb_optical_frame')
 
 	print(planes)
 	print(means)
