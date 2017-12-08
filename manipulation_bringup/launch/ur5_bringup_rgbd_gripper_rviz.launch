@@ -15,6 +15,8 @@
 	<!-- rosparam set /cube_description -t cube.urdf -->
 	<rosparam param="/cube_description" command="load" file="$(find ur_gripper_description)/urdf/objects/cube.urdf" />
 
+	<param name="/ur_driver/servoj_time" type="double" value="0.02" />
+
 	<!-- rosrun ur5_gripper_moveit_config transform_publisher.py -->
 	<node name="transform_publisher" pkg="ur5_gripper_moveit_config" type="transform_publisher.py" respawn="true" />  
 	

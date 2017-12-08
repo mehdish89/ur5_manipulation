@@ -4,10 +4,12 @@ Panels:
     Name: Displays
     Property Tree Widget:
       Expanded:
+        - /Global Options1
         - /Cube1/Links1
-        - /Cube1/Links1/cube1
+        - /Tag_A1
         - /MarkerArray1
         - /MarkerArray1/Namespaces1
+        - /WrenchStamped1
       Splitter Ratio: 0.425595
     Tree Height: 583
   - Class: rviz/Help
@@ -342,11 +344,6 @@ Visualization Manager:
         Expand Link Details: false
         Expand Tree: false
         Link Tree Style: Links in Alphabetic Order
-        cube:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
       Name: Cube
       Robot Description: cube_description
       TF Prefix: ""
@@ -388,7 +385,7 @@ Visualization Manager:
       Length: 0.05
       Name: Tag_A
       Radius: 0.01
-      Reference Frame: tag_2
+      Reference Frame: tool0
       Value: true
     - Class: rviz/Axes
       Enabled: true
@@ -440,11 +437,11 @@ Visualization Manager:
       Marker Topic: /objects
       Name: Marker
       Namespaces:
-        "": true
+        {}
       Queue Size: 100
       Value: true
     - Class: rviz/Image
-      Enabled: true
+      Enabled: false
       Image Topic: /camera/rgb/image_raw
       Max Value: 1
       Median window: 5
@@ -454,9 +451,9 @@ Visualization Manager:
       Queue Size: 2
       Transport Hint: raw
       Unreliable: false
-      Value: true
+      Value: false
     - Class: rviz/Image
-      Enabled: true
+      Enabled: false
       Image Topic: /servoing_image
       Max Value: 1
       Median window: 5
@@ -466,11 +463,24 @@ Visualization Manager:
       Queue Size: 2
       Transport Hint: raw
       Unreliable: false
+      Value: false
+    - Alpha: 1
+      Arrow Width: 0.5
+      Class: rviz/WrenchStamped
+      Enabled: true
+      Force Arrow Scale: 0.1
+      Force Color: 204; 51; 51
+      History Length: 1
+      Name: WrenchStamped
+      Topic: /force_torque
+      Torque Arrow Scale: 0.1
+      Torque Color: 204; 204; 51
+      Unreliable: false
       Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
-    Fixed Frame: zero
+    Fixed Frame: base
     Frame Rate: 30
   Name: root
   Tools:
@@ -482,38 +492,38 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/XYOrbit
-      Distance: 1.56964
+      Distance: 1.11227
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.06
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 0.955214
-        Y: -0.00226879
-        Z: -3.10605e-06
+        X: -0.333767
+        Y: -0.010667
+        Z: -2.51e-06
       Name: Current View
       Near Clip Distance: 0.01
-      Pitch: 0.604794
+      Pitch: 0.349794
       Target Frame: world
       Value: XYOrbit (rviz)
-      Yaw: 5.95348
+      Yaw: 2.67347
     Saved: ~
 Window Geometry:
   Displays:
-    collapsed: true
+    collapsed: false
   Height: 1056
   Help:
     collapsed: false
-  Hide Left Dock: false
-  Hide Right Dock: true
+  Hide Left Dock: true
+  Hide Right Dock: false
   Motion Planning:
-    collapsed: true
-  QMainWindow State: 000000ff00000000fd00000002000000000000036d000003dafc0200000006fb0000000800480065006c00700000000342000000bb0000007600fffffffb0000000a0056006900650077007300000003b0000000b0000000b000fffffffb0000000c00430061006d00650072006100000002ff000001610000000000000000fb00000012005200470042005f0069006d0061006700650100000028000002a40000001600fffffffb0000000a0049006d00610067006500000002dc000001260000000000000000fb0000001c0053006500720076006f0069006e0067005f0069006d00610067006501000002d2000001300000001600ffffff00000001000002a2000003dafc0200000001fc00000028000003da0000000000fffffffaffffffff0100000002fb0000001e004d006f00740069006f006e00200050006c0061006e006e0069006e00670000000000ffffffff000002a200fffffffb000000100044006900730070006c00610079007300000005b40000018b0000016a00ffffff000003cc000003da00000001000000020000000100000002fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+    collapsed: false
+  QMainWindow State: 000000ff00000000fd00000002000000000000028d000003dafc0200000006fb0000000800480065006c00700000000342000000bb0000007600fffffffb0000000a0056006900650077007300000003b0000000b0000000b000fffffffb0000000c00430061006d00650072006100000002ff000001610000000000000000fb00000012005200470042005f0069006d0061006700650000000028000002a40000001600fffffffb0000000a0049006d00610067006500000002dc000001260000000000000000fb0000001c0053006500720076006f0069006e0067005f0069006d00610067006500000002d2000001300000001600ffffff00000001000002a2000003dafc0200000001fc00000028000003da000001ea0100001dfa000000010100000002fb0000001e004d006f00740069006f006e00200050006c0061006e006e0069006e00670100000000ffffffff000002a200fffffffb000000100044006900730070006c00610079007301000005b40000018b0000016a00ffffff00000497000003da00000001000000020000000100000002fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
   RGB_image:
-    collapsed: false
+    collapsed: true
   Servoing_image:
-    collapsed: false
+    collapsed: true
   Views:
     collapsed: false
   Width: 1855

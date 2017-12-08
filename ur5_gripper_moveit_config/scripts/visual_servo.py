@@ -29,7 +29,7 @@ from threading import Lock
 
 from std_msgs.msg import Float32MultiArray as FArray
 
-from shape_detection import detect_rects
+from shape_detection import detect_boxes
 
 
 
@@ -158,6 +158,8 @@ def find_trs(src, dst):
 
 	for i in slines:
 		for j in dlines:
+			# print(src[i, :])
+			# print(dst[i, :])
 			scl = find_scale(src[i, :], dst[j, :])
 			prj = scale(src, src[i[0]], scl)
 
@@ -182,12 +184,12 @@ def find_trs(src, dst):
 
 
 
-	print('err', err)
+	# print('err', err)
 
-	if(err>40):
-		t = [0,0]
-		r = 0
-		s = 1
+	# if(err>40):
+	# 	t = [0,0]
+	# 	r = 0
+	# 	s = 1
 
 	return t, r, s, c
 
@@ -212,12 +214,56 @@ counter = 0
 
 lock = Lock()
 
+
+
+def find_best(boxes, goal):
+	err = 100000000
+
+	lmin = 100000000
+
+	t = None
+	r = None
+	s = None
+	c = None
+	index = 0
+
+	for i in range(len(boxes)):
+		points = boxes[i]
+		trans, rot, scl, ctr = find_trs(points, goal)
+
+		prj = np.array(points)
+		prj = scale(prj, prj[ctr], scl)
+		prj = rotate(prj, prj[ctr], rot)
+		prj = prj + trans
+
+		new_err = error(prj, goal)
+
+		smean = np.mean(points, axis = 0)
+		dmean = np.mean(goal, axis = 0)
+		l = dmean - smean
+		l = sqrt(sum(l**2))
+
+		thr = 20
+
+		if new_err < err-thr or (new_err<err+thr and l<lmin) :
+			lmin = l
+			t = trans
+			r = rot
+			s = scl
+			c = ctr
+			index = i
+		
+		err = min(new_err, err)
+
+	return t, r, s, c, err, index
+
+
 def handle_frame(msg):
 
-	global counter
-	counter+=1
-	if(counter%3>0):
-		return
+	# global counter
+	# counter+=1
+	# if(counter%3>0):
+	# 	return
 
 	try:
 		img = bridge.imgmsg_to_cv2(msg, "bgr8")
@@ -226,135 +272,31 @@ def handle_frame(msg):
 
 	# img = cv2.medianBlur(img,5)
 	# img = cv2.blur(img,(10,10))
-	img = cv2.GaussianBlur(img,(11,11),0)
+	# img = cv2.GaussianBlur(img,(11,11),0)
 
 	h = img.shape[0]
 	w = img.shape[1]
 
-	img2 = np.array(img)
+	img2 = np.array(img)	
+	dst = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
 
-
-	hsv = cv2.cvtColor(img2, cv2.COLOR_BGR2HSV)
-
-	# lb = np.array([50,110,110])
-	# ub = np.array([140,255,255])
-
-	# print(video)
-
-
-	mn = 150
-
-	lb = np.array([0,mn,80])
-	ub = np.array([25,250,250])
-
-	mask1 = cv2.inRange(hsv, lb, ub)
-
-	lb = np.array([170,mn,80])
-	ub = np.array([180,250,250])
-
-	mask2 = cv2.inRange(hsv, lb, ub)
-
-	# [   8.   33.  130.]
-	# [  25.  186.  198.]
-
-	ORANGE_MIN = np.array([   3.,   27.,  104.],np.uint8)
-	ORANGE_MAX = np.array([  16.,   74.,  201.],np.uint8)
-
-	mask = np.maximum(mask1, mask2)
-
-	mask = cv2.inRange(hsv, ORANGE_MIN, ORANGE_MAX)
-
-	# print(mask.shape)
-
-
-	kernel = np.ones((5,5),np.uint8)
-	mask = cv2.dilate(mask,kernel,iterations = 1)
-
-	kernel = np.ones((5,5),np.uint8)
-	mask = cv2.erode(mask,kernel,iterations = 1)
 
 	
-	
+	boxes = detect_boxes(img2)
 
-	# gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
-
-	# ret, thresh = cv2.threshold(gray,0,255,cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)
-
-	# cimg = cv2.cvtColor(img,cv2.COLOR_GRAY2BGR)
-
-	res = cv2.bitwise_and(img, img, mask= mask)
-	edge = cv2.Canny(mask,0,125)
-
-	gray = cv2.cvtColor(res,cv2.COLOR_BGR2GRAY)
-
-	# res = (res/2)+(img/2)
-	# edge = (edge/2)+(gray/2)
-
-	# cv2.imwrite("goal.png", edge)
-	# np.save("goal.txt", edge)
-
-	# gray = cv2.cvtColor(res,cv2.COLOR_BGR2GRAY)
-
-	# find Harris corners
-	# gray = np.float32(gray)
-	
-
-	kernel = np.ones((9,9),np.uint8)
-	gray = cv2.dilate(gray,kernel,iterations = 1)
-
-	kernel = np.ones((9,9),np.uint8)
-	gray = cv2.erode(gray,kernel,iterations = 1)
+	points = []
 
 
-	dst = cv2.cornerHarris(gray,10,11,0.1)
-	dst = cv2.dilate(dst,None)
-	ret, dst = cv2.threshold(dst,0.01*dst.max(),255,0)
-	dst = np.uint8(dst)
-
-	# corners = [(x,y) for y in xrange(h) for x in xrange(w) if dst[y][x]>0]
-	# count = 0
-	# for y in range(h):
-	# 	for x in range(w):
-	# 		count+=1
-	# 		if(dst[y,x]>0):
-	# 			global nothing
-	# corners = cluster(corners)
-
-	global defined
-	if(not defined):
-		global prod
-		defined = True
-		prod = np.array(list(product(np.arange(h), np.arange(w)))).reshape((h,w,2))
-
-	mean = np.array([0,0])
-	points = prod[gray>0]	
-	mean = np.mean(points, axis=0)
-
-	# print(prod)
-
-	# ind = np.indices([h,w])
-	# rows, cols = 
-	# print(ind[:][dst>0])
-	
-	
-
-	# if lock.acquire(False): # will block if lock is already held
-	points = prod[dst>0]
-	if(len(points)>0):
-		points = cluster(points, .20)
-		# print points
-		# lock.release()
-
-
-
-	print ("after lock")
 
 	mid = np.array([h/2, w/2])
 
-	gscale = .85
+	gscale = 1.02
+
+	# rh = gscale * 170/2
+	# rw = gscale * 200/2
 
 	rh = gscale * 170/2
-	rw = gscale * 200/2
+	rw = gscale * 197/2
 
 	# gscale = 4
 
@@ -368,19 +310,28 @@ def handle_frame(msg):
 					
 	goal = np.array(goal)
 
-	if len(points)==0:
-		points = np.array(goal)
-
-	points = np.array(sorted(points, key = lambda x: x[0]))
-
 	goal = np.array(sorted(goal, key = lambda x: x[0]))
 
 	print(points)
 
 	print(goal)
 
+	trans, rot, scl, ctr, err, index = find_best(boxes, goal)
 
-	trans, rot, scl, ctr = find_trs(points, goal)
+	# trans, rot, scl, ctr = find_trs(points, goal)
+
+	if err>40 or scl>10:
+		rot = 0.
+		scl = 1.
+	
+
+	if len(boxes)==0:
+		points = np.array(goal)
+		return
+	else:
+		points = boxes[index]
+
+	# points = np.array(sorted(points, key = lambda x: x[0]))
 
 	prj = np.array(points)
 	prj = scale(prj, prj[ctr], scl)
@@ -388,45 +339,18 @@ def handle_frame(msg):
 	prj = prj + trans
 
 	# if rot==0:
-	avg = np.float32(sum(points))/len(points)
-	# trans = mid - avg
+	# avg = np.float32(sum(points))/len(points)
+	# # trans = mid - avg
 
-	trans = mid - mean
+	# trans = mid - mean
 
-	print(mean, avg)
+	# print(mean, avg)
 
 		
 	publish_trs(trans, rot, scl)
 
 	print trans, rot, scl
 
-	
-
-
-	# print("scale to {0}", scale)
-	# prj = eval_trs(points, goal, points[0], trans, rot, scale)
-
-
-
-
-	# # find centroids
-	# ret, labels, stats, centroids = cv2.connectedComponentsWithStats(dst)
-
-	# # define the criteria to stop and refine the corners
-	# criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 100, 0.001)
-	# corners = cv2.cornerSubPix(gray,np.float32(centroids),(5,5),(-1,-1),criteria)
-
-	# Now draw them
-
-	# res = np.hstack((centroids,corners))
-	# res = np.int0(res)
-
-
-
-	# img[res[:,1],res[:,0]]=[0,0,255]
-	# img[res[:,3],res[:,2]] = [0,255,0]
-
-	# dst = (gray/2)+(dst/2)
 
 	points[:,[0, 1]] = points[:,[1, 0]]
 	goal[:,[0, 1]] = goal[:,[1, 0]]
@@ -435,9 +359,9 @@ def handle_frame(msg):
 	dst = cv2.cvtColor(dst,cv2.COLOR_GRAY2BGR)
 	# dst = np.array(img2+dst)
 
-	masked = cv2.cvtColor(mask,cv2.COLOR_GRAY2BGR)
+	# masked = cv2.cvtColor(mask,cv2.COLOR_GRAY2BGR)
 
-	dst = np.fmax(img, masked)
+	# dst = np.fmax(img, masked)
 
 
 	cv2.polylines(dst, np.int32([points]), 1, (255,0,0))
@@ -450,6 +374,7 @@ def handle_frame(msg):
 
 	cv2.circle(dst, cpt1, 5, (0, 255, 0), -1) 
 	cv2.circle(dst, cpt2, 5, (255, 0, 0), -1) 
+	
 	# cv2.circle(dst,(447,63), 63, (0,0,255), -1)
 	# cv2.polylines(dst, goal, True, 0) 
 	# dst = (dst/2 + img2/2)
@@ -461,7 +386,7 @@ def handle_frame(msg):
 
 	# cv2.imshow('detected circles',dst)
 	# if cv2.waitKey(1) & 0xFF == ord('q'):
-	# 		exit(0)
+	# 	exit(0)
 	# plt.draw()
 
 
@@ -490,3 +415,51 @@ def main(argv=None):
 if __name__ == "__main__":
     sys.exit(main())
 
+
+def filter_color(img):
+	img2 = img
+	hsv = cv2.cvtColor(img2, cv2.COLOR_BGR2HSV)
+
+	ORANGE_MIN = np.array([   3.,   27.,  104.],np.uint8)
+	ORANGE_MAX = np.array([  16.,   74.,  201.],np.uint8)
+
+	mask = cv2.inRange(hsv, ORANGE_MIN, ORANGE_MAX)
+
+	kernel = np.ones((5,5),np.uint8)
+	mask = cv2.dilate(mask,kernel,iterations = 1)
+
+	kernel = np.ones((5,5),np.uint8)
+	mask = cv2.erode(mask,kernel,iterations = 1)
+
+
+	res = cv2.bitwise_and(img, img, mask= mask)
+	edge = cv2.Canny(mask,0,125)
+
+	gray = cv2.cvtColor(res,cv2.COLOR_BGR2GRAY)
+	
+
+	kernel = np.ones((9,9),np.uint8)
+	gray = cv2.dilate(gray,kernel,iterations = 1)
+
+	kernel = np.ones((9,9),np.uint8)
+	gray = cv2.erode(gray,kernel,iterations = 1)
+
+
+	dst = cv2.cornerHarris(gray,10,11,0.1)
+	dst = cv2.dilate(dst,None)
+	ret, dst = cv2.threshold(dst,0.01*dst.max(),255,0)
+	dst = np.uint8(dst)
+
+	global defined
+	if(not defined):
+		global prod
+		defined = True
+		prod = np.array(list(product(np.arange(h), np.arange(w)))).reshape((h,w,2))
+
+	mean = np.array([0,0])
+	points = prod[gray>0]	
+	mean = np.mean(points, axis=0)
+
+	points = prod[dst>0]
+	if(len(points)>0):
+		points = cluster(points, .20)

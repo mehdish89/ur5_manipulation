@@ -139,7 +139,7 @@ def activate():
 
 
 
-def gripper(val):
+def gripper(pos, speed = 70, force = 20):
 
     global is_active
     if(not is_active):
@@ -149,12 +149,12 @@ def gripper(val):
     cmd.rACT = 1
     cmd.rGTO = 1
     # cmd.rSP = 30
-    cmd.rSP = 70
-    cmd.rFR = 20
+    cmd.rSP = speed
+    cmd.rFR = force
 
     # cmd.rFR = 100
 
-    cmd.rPR = val
+    cmd.rPR = pos
     grip_pub.publish(cmd)
 
 
@@ -173,7 +173,7 @@ def check_forward():
 def servoing_callback(msg):
     global gtrans, grot, gscale
 
-    gtrans = [msg.data[0], msg.data[1]]
+    gtrans = np.array([msg.data[0], msg.data[1]])
     grot = msg.data[2]
     gscale = msg.data[3]
 
@@ -325,6 +325,9 @@ def alog(x):
         return -math.log(1-x)
 
 
+gtrans = np.array([0.0,0.0])
+grot = 0.
+gscale = 0.95
 
 def servo(group, dtrans = np.array([0.,0.]), drot = 0., dscale = 0.):   
     global gtrans, grot, gscale
@@ -337,8 +340,8 @@ def servo(group, dtrans = np.array([0.,0.]), drot = 0., dscale = 0.):
 
     tf_count = 0
 
-    x_PID = PID(P=1., I=0.000, D=0.0000)
-    y_PID = PID(P=1., I=0.000, D=0.0000)
+    x_PID = PID(P=1.5, I=0.000, D=0.0000)
+    y_PID = PID(P=1.5, I=0.000, D=0.0000)
     z_PID = PID(P=2, I=0.0001, D=0.0000)
     th_PID = PID(P=0.8, I=0.000, D=0.0000)
     
@@ -347,13 +350,16 @@ def servo(group, dtrans = np.array([0.,0.]), drot = 0., dscale = 0.):
     z_PID.setPoint(0.)
     th_PID.setPoint(0.)
 
+    print(gtrans, dtrans)
+
     trans = gtrans - dtrans  
     rot = grot - drot
     scale = gscale - dscale
 
-    while abs(scale-1)>0.05 or abs(rot)>0.005 or abs(dx)>0.0005 or abs(dy)>0.0005:
+    while abs(scale-1)>0.02 or abs(rot)>0.02 or abs(dx)>0.0001 or abs(dy)>0.0001:
 
         print("c", tf_count)
+        print (abs(scale-1), abs(rot), abs(dx), abs(dy))
 
         if(tf_count%5==0):
             print("update")
@@ -590,12 +596,26 @@ if __name__ == '__main__':
 
     # print(goal)
 
-    rot0 = np.array([-0.650476083998,
-                    0.759441816647,
-                    0.00827562458826,
-                    0.00777851607368])
+    # trans0 = np.array([0.601, 0.317, 0.335])
+    # rot0 = np.array([-0.687, 0.726, 0.009, 0.007])
+
+    trans0 = np.array([0.576, 0.326, 0.335])
+    rot0 = np.array([-0.701, 0.713, 0.014, -0.009])
+
+
+    # servo(group, dscale = 0.)
 
     # sys.exit(0)
+
+    l = 0.1125
+    n = 18
+    oh = l/(2 * n)
+
+    prep = 13
+    for i in range(prep):
+        steps += 0.01
+        n -= 1
+        oh += l/(2 * n) - 0.004 / sqrt(n)
 
     while not rospy.is_shutdown():
         gripper(0)
@@ -611,7 +631,7 @@ if __name__ == '__main__':
         # pose_target.orientation.w = 1.0
 
         try:
-            (gtrans,grot) = listener.lookupTransform('/base_link', 'cube', rospy.Time(0))
+            (qtrans,qrot) = listener.lookupTransform('/base_link', 'cube', rospy.Time(0))
         except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
             print("Exception caught")
             continue
@@ -627,10 +647,10 @@ if __name__ == '__main__':
             # rate.sleep()
 
 
-        gtrans = np.array(gtrans)
-        gtrans[2] += 0.25
+        qtrans = np.array(qtrans)
+        qtrans[2] += 0.25
 
-        result = plan_to(group, gtrans)
+        result = plan_to(group, qtrans)
         if(result.joint_trajectory.header.frame_id == ''):
             continue
 
@@ -671,19 +691,26 @@ if __name__ == '__main__':
             continue
         check_forward()
 
-        plan_to(group, np.array((0.66 + steps, 0.32, 0.40  + steps)), rot0)
+        
+
+        plan_to(group, trans0 + np.array([-oh, 0., 0.06 + steps]), rot0)
         check_forward()
 
         group.go(wait=True) 
         check_forward()
 
-        plan_to(group, np.array((0.66 + steps, 0.32, 0.342 - 0.002 + steps)), rot0)
+        plan_to(group, trans0 + np.array([-oh, 0., +steps]), rot0)
         check_forward()
 
         group.go(wait=True) 
         check_forward() 
 
-        gripper(0)
+        gripper(145, speed = 20)
+        rospy.sleep(0.6)
+
+        gripper(0, speed = 20)
         steps += 0.01
+        n -= 1
+        oh += l/(2 * n) - 0.004 / sqrt(n)
 
         rate.sleep()

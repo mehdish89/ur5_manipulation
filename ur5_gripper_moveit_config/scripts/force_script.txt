@@ -1,0 +1,75 @@
+def kinetiq_start():
+
+  global timer=0
+
+  #fonction pour convertir une force et un moment du repere du tcp vers le repere de la base
+  def toolWrenchToBase(w):
+    global my_pose=get_actual_tcp_pose()
+    p_from = p[0, 0, 0, my_pose[3], my_pose[4], my_pose[5]]
+    force=pose_trans(p_from, p[w[0], w[1], w[2], 0, 0, 0])
+    torque=pose_trans(p_from, p[w[3], w[4], w[5], 0, 0, 0])
+    return [force[0], force[1], force[2], torque[0], torque[1], torque[2]]
+  end
+
+  #addition element par element de 2 listes
+  #on ne verifie pas que les 2 listes aient la meme longueur
+  def elementWiseAdd(list1, list2):
+    global rlist=list1
+    i=0
+    while i<length(list1):
+      rlist[i]=list1[i] + list2[i]
+      i=i+1
+    end
+    return rlist
+  end
+
+  thread Thread_Watchdog():
+    while(True):
+      timer = timer + 0.008
+      sync()
+    end
+  end
+
+  thread Thread_1():
+    if socket_open("127.0.0.1",63351,"stream") == True:
+      while (True):
+        global J=socket_read_ascii_float(6,"stream")
+
+        if J[0]==6:
+          global based_tool_speed = toolWrenchToBase([J[1], J[2], J[3], J[4], J[5], J[6]])
+
+          i=0
+      while i<length(based_tool_speed):
+      based_tool_speed[i] = based_tool_speed[i]/1000
+      i=i+1
+      end
+
+          # global reorient_speed = [0.0, 0.0, 0.0, J[7], J[8], J[9]]
+          global total_speed = based_tool_speed # elementWiseAdd(based_tool_speed, reorient_speed)
+          timer = 0
+        end
+        sleep(0.1)
+      end
+    else:
+      timer = 2
+    end
+  end
+
+  global based_tool_speed = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+  global reorient_speed = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+  global total_speed = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+
+  thread_1_id = run Thread_1()
+  thread_watchdog_id = run Thread_Watchdog()
+
+  #if(version 3.X)force_mode(tool_pose(), [0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0], 2, [0.5, 0.5, 0.5, 1, 1, 1])
+  while (timer < 3):
+    # speedl(total_speed, 10, 0.008)
+    sync()
+  end
+  end_force_mode()
+
+  # popup(total_speed)
+
+  # popup("end")
+end

@@ -1,0 +1,29 @@
+#V4L2/CTRL/0.0.2
+APP{"guvcview 1.7.1"}
+# control data
+#Brightness
+ID{0x00980900};CHK{0:255:1:0}=VAL{0}
+#Contrast
+ID{0x00980901};CHK{0:255:1:32}=VAL{32}
+#Saturation
+ID{0x00980902};CHK{0:255:1:64}=VAL{64}
+#Hue
+ID{0x00980903};CHK{-90:90:1:0}=VAL{0}
+#White Balance, Automatic
+ID{0x0098090c};CHK{0:1:1:1}=VAL{1}
+#Exposure
+ID{0x00980911};CHK{0:255:1:120}=VAL{56}
+#Gain, Automatic
+ID{0x00980912};CHK{0:1:1:1}=VAL{1}
+#Gain
+ID{0x00980913};CHK{0:63:1:20}=VAL{0}
+#Horizontal Flip
+ID{0x00980914};CHK{0:1:1:0}=VAL{0}
+#Vertical Flip
+ID{0x00980915};CHK{0:1:1:0}=VAL{0}
+#Power Line Frequency
+ID{0x00980918};CHK{0:1:1:0}=VAL{0}
+#Sharpness
+ID{0x0098091b};CHK{0:63:1:0}=VAL{0}
+#Auto Exposure
+ID{0x009a0901};CHK{0:1:1:0}=VAL{0}
